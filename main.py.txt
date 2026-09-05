@@ -1,0 +1,192 @@
+from kivy.app import App
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.scrollview import ScrollView
+from kivy.uix.label import Label
+from kivy.uix.textinput import TextInput
+from kivy.uix.button import Button
+from kivy.uix.spinner import Spinner
+import math
+
+class HesaplaApp(App):
+    def build(self):
+        self.title = 'ÇİFCİLER HESAPLAYICI'
+
+        root = ScrollView(size_hint=(1, 1))
+        
+        # Ekranı dikeyde esnek paylaştıran ana düzen
+        layout = BoxLayout(orientation='vertical', padding=15, spacing=10, size_hint_y=None)
+        layout.bind(minimum_height=layout.setter('height'))
+
+        # Başlık
+        layout.add_widget(Label(
+            text="[b]ÇİFCİLER HESAPLAYICI[/b]", 
+            markup=True, 
+            font_size='22sp', 
+            size_hint_y=None, 
+            height='40dp'
+        ))
+
+        # Uzunluk (X)
+        layout.add_widget(Label(text="Uzunluk / Metraj (Metre) [X]:", font_size='15sp', size_hint_y=None, height='25dp', halign='left', valign='middle'))
+        self.input_uzunluk = TextInput(
+            input_filter='float', 
+            multiline=False, 
+            font_size='20sp', 
+            size_hint_y=None, 
+            height='50dp'
+        )
+        layout.add_widget(self.input_uzunluk)
+
+        # Genişlik (Y)
+        layout.add_widget(Label(text="Genişlik / En (Metre) [Y]:", font_size='15sp', size_hint_y=None, height='25dp', halign='left', valign='middle'))
+        self.input_genislik = TextInput(
+            input_filter='float', 
+            multiline=False, 
+            font_size='20sp', 
+            size_hint_y=None, 
+            height='50dp'
+        )
+        layout.add_widget(self.input_genislik)
+
+        # Derinlik / Yükseklik (Z)
+        layout.add_widget(Label(text="Derinlik / Yükseklik [Z] (Beton vb. İçin):", font_size='15sp', size_hint_y=None, height='25dp', halign='left', valign='middle'))
+        self.input_derinlik = TextInput(
+            text="1", 
+            input_filter='float', 
+            multiline=False, 
+            font_size='20sp', 
+            size_hint_y=None, 
+            height='50dp'
+        )
+        layout.add_widget(self.input_derinlik)
+
+        # Malzeme Seçimi Dropdown
+        layout.add_widget(Label(text="Hesaplanacak Malzeme Seçiniz:", font_size='15sp', size_hint_y=None, height='25dp', halign='left', valign='middle'))
+        self.spinner = Spinner(
+            text='1- Hazır Beton (m³)',
+            values=(
+                '1- Hazır Beton (m³)',
+                '2- BİMS 10cm (10x39x18.5)',
+                '3- BİMS 15cm (15x39x18.5)',
+                '4- BİMS 20cm (20x39x18.5)',
+                '5- BİMS 25cm (25x39x18.5)',
+                '6- BİMS 30cm (30x39x18.5)',
+                '7- Tuğla 8.5cm (8.5x19x19)',
+                '8- Tuğla 13.5cm (13.5x19x19)',
+                '9- Tuğla 19cm (19x19x19)',
+                '10- İzo Tuğla 20cm (20x24x23.5)',
+                '11- İzo Tuğla 25cm (25x24x23.5)',
+                '12- Yığma Tuğla (20x30x14)',
+                '13- 40x40 cm Fayans',
+                '14- 60x60 cm Fayans',
+                '15- 60x120 cm Fayans',
+                '16- Alçıpan Plakası (120x250 cm)',
+                '17- 32. Sınıf Parke (8mm)',
+                '18- 33. Sınıf Parke (10-12mm)',
+                '19- Şilte Metresi (m²)'
+            ),
+            size_hint_y=None,
+            height='55dp',
+            font_size='15sp'
+        )
+        layout.add_widget(self.spinner)
+
+        # Hesapla Butonu
+        btn = Button(
+            text="HESAPLA", 
+            background_color=(0.1, 0.6, 0.4, 1), 
+            font_size='20sp', 
+            bold=True,
+            size_hint_y=None, 
+            height='60dp'
+        )
+        btn.bind(on_press=self.hesapla)
+        layout.add_widget(btn)
+
+        # Sonuç Alanı
+        self.lbl_sonuc = Label(
+            text="Ölçüleri girip HESAPLA butonuna basın.", 
+            font_size='16sp', 
+            size_hint_y=None, 
+            height='120dp',
+            halign='center',
+            valign='middle'
+        )
+        self.lbl_sonuc.bind(size=self.lbl_sonuc.setter('text_size'))
+        layout.add_widget(self.lbl_sonuc)
+
+        root.add_widget(layout)
+        return root
+
+    def hesapla(self, instance):
+        try:
+            x = float(self.input_uzunluk.text)
+            y = float(self.input_genislik.text)
+            z = float(self.input_derinlik.text) if self.input_derinlik.text else 1.0
+            
+            alan = x * y
+            hacim = x * y * z
+            secim = self.spinner.text
+
+            if secim.startswith('1-'):
+                fireli_hacim = hacim * 1.05
+                self.lbl_sonuc.text = f"Ebatlar: {x}m x {y}m x {z}m\nNet Beton Hacmi: {hacim:.2f} m³\nÖnerilen (%5 Fireli): {fireli_hacim:.2f} m³"
+
+            elif 'BİMS' in secim:
+                net_bims = math.ceil(alan * 12.5)
+                fireli_bims = math.ceil(net_bims * 1.07)
+                self.lbl_sonuc.text = f"Duvar Alanı: {alan:.2f} m²\nNet BİMS: {net_bims} Adet\nÖnerilen (%7 Fire): {fireli_bims} Adet"
+
+            elif 'Tuğla 8.5cm' in secim or 'Tuğla 13.5cm' in secim or 'Tuğla 19cm' in secim:
+                net_tugla = math.ceil(alan * 25)
+                fireli_tugla = math.ceil(net_tugla * 1.08)
+                self.lbl_sonuc.text = f"Duvar Alanı: {alan:.2f} m²\nNet Tuğla: {net_tugla} Adet\nÖnerilen (%8 Fire): {fireli_tugla} Adet"
+
+            elif 'İzo Tuğla' in secim:
+                net_tugla = math.ceil(alan * 16)
+                fireli_tugla = math.ceil(net_tugla * 1.08)
+                self.lbl_sonuc.text = f"Duvar Alanı: {alan:.2f} m²\nNet İzo Tuğla: {net_tugla} Adet\nÖnerilen (%8 Fire): {fireli_tugla} Adet"
+
+            elif 'Yığma Tuğla' in secim:
+                net_tugla = math.ceil(alan * 22)
+                fireli_tugla = math.ceil(net_tugla * 1.08)
+                self.lbl_sonuc.text = f"Duvar Alanı: {alan:.2f} m²\nNet Yığma Tuğla: {net_tugla} Adet\nÖnerilen (%8 Fire): {fireli_tugla} Adet"
+
+            elif '40x40' in secim:
+                net = math.ceil(alan / 0.16)
+                fireli = math.ceil((alan * 1.10) / 0.16)
+                self.lbl_sonuc.text = f"Zemin Alanı: {alan:.2f} m²\nNet Fayans: {net} Adet (40x40)\nÖnerilen (%10 Fire): {fireli} Adet"
+
+            elif '60x60' in secim:
+                net = math.ceil(alan / 0.36)
+                fireli = math.ceil((alan * 1.10) / 0.36)
+                self.lbl_sonuc.text = f"Zemin Alanı: {alan:.2f} m²\nNet Fayans: {net} Adet (60x60)\nÖnerilen (%10 Fire): {fireli} Adet"
+
+            elif '60x120' in secim:
+                net = math.ceil(alan / 0.72)
+                fireli = math.ceil((alan * 1.10) / 0.72)
+                self.lbl_sonuc.text = f"Zemin Alanı: {alan:.2f} m²\nNet Fayans: {net} Adet (60x120)\nÖnerilen (%10 Fire): {fireli} Adet"
+
+            elif 'Alçıpan' in secim:
+                net = math.ceil(alan / 3.00)
+                fireli = math.ceil((alan * 1.05) / 3.00)
+                self.lbl_sonuc.text = f"Kaplama Alanı: {alan:.2f} m²\nNet Alçıpan: {net} Plaka\nÖnerilen (%5 Fire): {fireli} Plaka"
+
+            elif '32. Sınıf' in secim:
+                paket = math.ceil((alan * 1.10) / 1.83)
+                self.lbl_sonuc.text = f"Alan: {alan:.2f} m²\nGereken: {paket} PAKET (32. Sınıf Parke)\nToplam Metraj: {paket * 1.83:.2f} m²"
+
+            elif '33. Sınıf' in secim:
+                paket = math.ceil((alan * 1.10) / 1.50)
+                self.lbl_sonuc.text = f"Alan: {alan:.2f} m²\nGereken: {paket} PAKET (33. Sınıf Parke)\nToplam Metraj: {paket * 1.50:.2f} m²"
+
+            elif 'Şilte' in secim:
+                silte_m2 = alan * 1.05
+                rulo = math.ceil(silte_m2 / 15.0)
+                self.lbl_sonuc.text = f"Net Zemin: {alan:.2f} m²\nGereken Şilte (%5 Fire): {silte_m2:.2f} m²\nRulo Sayısı (15m²'lik): {rulo} Rulo"
+
+        except ValueError:
+            self.lbl_sonuc.text = "Lütfen geçerli sayılar giriniz!"
+
+if __name__ == '__main__':
+    HesaplaApp().run()
