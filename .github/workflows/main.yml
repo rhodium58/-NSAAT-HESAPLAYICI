@@ -10,26 +10,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.11'
 
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y ccache git libffi-dev libssl-dev build-essential python3-dev libltdl-dev libffi-dev libssl-dev cython3
+        sudo apt-get install -y ccache git libffi-dev libssl-dev build-essential python3-dev libltdl-dev cython3
 
     - name: Build with Buildozer
-      uses: ArtemShedko/buildozer-action@v1.2.0
+      uses: aksai-sd/buildozer-action@v1.4.0
       with:
         command: buildozer -v android debug
         submodule: false
 
     - name: Upload APK
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: CifcilerHesaplayici-APK
         path: bin/*.apk
