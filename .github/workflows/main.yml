@@ -10,13 +10,13 @@ jobs:
     runs-on: ubuntu-22.04
 
     steps:
-    - name: Repo Kopyala
+    - name: Repoyu Çek
       uses: actions/checkout@v4
 
     - name: Python Kurulumu
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.11'
 
     - name: Java JDK 17 Kurulumu
       uses: actions/setup-java@v4
@@ -24,11 +24,11 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Sistem Bağımlılıklarını ve Buildozer'ı Kur
+    - name: Sistem Sistem Bağımlılıklarını ve Buildozer'ı Kur
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential git python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixin-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgdbm-dev libncurses5-dev libssl-dev libffi-dev libreadline-dev libsqlite3-dev libbz2-dev ccache zip unzip
-        pip install --upgrade pip
+        sudo apt-get install -y build-essential git python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgdbm-dev libncurses5-dev libssl-dev libffi-dev libreadline-dev libsqlite3-dev libbz2-dev ccache zip unzip
+        python -m pip install --upgrade pip setuptools
         pip install "cython<3.0.0" buildozer
 
     - name: APK Derleme (Buildozer)
