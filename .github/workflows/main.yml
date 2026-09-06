@@ -7,35 +7,35 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-20.04
 
     steps:
-    - name: Repoyu Çek
+    - name: Repoyu Cek
       uses: actions/checkout@v4
 
     - name: Python Kurulumu
       uses: actions/setup-python@v5
       with:
-        python-version: '3.10'
+        python-version: '3.9'
 
-    - name: Java JDK 17 Kurulumu
+    - name: Java JDK 11 Kurulumu
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: '17'
+        java-version: '11'
 
-    - name: Bağımlılıkları ve Buildozer'ı Kur
+    - name: Sistem Bagimliliklarini Kur
       run: |
         sudo apt-get update
-        sudo apt-get install -y build-essential git python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgdbm-dev libncurses5-dev libssl-dev libffi-dev libreadline-dev libsqlite3-dev libbz2-dev ccache zip unzip
+        sudo apt-get install -y build-essential git python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgdbm-dev libncurses5-dev libssl-dev libffi-dev libreadline-dev libsqlite3-dev libbz2-dev ccache zip unzip pkg-config
         python -m pip install --upgrade pip setuptools
-        pip install "cython<3.0.0" buildozer
+        pip install "cython<0.29.34" "buildozer==1.5.0"
 
-    - name: APK Derleme (Buildozer)
+    - name: APK Derleme
       run: |
-        yes | buildozer -v android debug
+        yes | buildozer android debug
 
-    - name: APK Dosyasını Yükle
+    - name: APK Dosyasini Yukle
       uses: actions/upload-artifact@v4
       with:
         name: CifcilerHesaplayici-APK
