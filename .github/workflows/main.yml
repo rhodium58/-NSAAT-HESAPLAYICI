@@ -16,7 +16,7 @@ jobs:
     - name: Python Kurulumu
       uses: actions/setup-python@v5
       with:
-        python-version: '3.11'
+        python-version: '3.10'
 
     - name: Java JDK 17 Kurulumu
       uses: actions/setup-java@v4
@@ -24,7 +24,7 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
 
-    - name: Sistem Sistem Bağımlılıklarını ve Buildozer'ı Kur
+    - name: Bağımlılıkları ve Buildozer'ı Kur
       run: |
         sudo apt-get update
         sudo apt-get install -y build-essential git python3-dev ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libgdbm-dev libncurses5-dev libssl-dev libffi-dev libreadline-dev libsqlite3-dev libbz2-dev ccache zip unzip
@@ -33,7 +33,7 @@ jobs:
 
     - name: APK Derleme (Buildozer)
       run: |
-        buildozer -v android debug
+        yes | buildozer -v android debug
 
     - name: APK Dosyasını Yükle
       uses: actions/upload-artifact@v4
